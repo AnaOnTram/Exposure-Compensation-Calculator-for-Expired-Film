@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expired Film Speed Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+            background-image: url('Background.JPG');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .title {
+            font-size: 80px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+        .subtitle {
+            font-size: 24px;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+        .form-group {
+            margin-bottom: 30px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        select, .month-picker {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 0;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+        select:focus, .month-picker:focus {
+            outline: none;
+            border-color: #999;
+        }
+        .month-picker {
+            display: flex;
+        }
+        .month-picker select {
+            flex: 1;
+            margin-right: 10px;
+        }
+        button {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            padding: 15px 0;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        button:hover {
+            background-color: #333;
+        }
+        .result {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f8f8f8;
+            border-left: 4px solid #000;
+        }
+        .result h3 {
+            font-size: 22px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .result p {
+            margin: 10px 0;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .credits {
+            margin-top: 60px;
+            text-align: center;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            font-size: 14px;
+        }
+        .close-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 18px;
+            cursor: pointer;
+            color: #fff;
+            background-color: rgba(0,0,0,0.5);
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 50%;
+        }
+        @media (max-width: 768px) {
+            .title {
+                font-size: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="header">
+        <div class="title">The Forgotten Time</div>
+        <div class="subtitle">Expired Film Calculator</div>
+    </div>
+    
+    <div class="container">
+        <div class="form-group">
+            <label for="filmType">Film Type:</label>
+            <select id="filmType" required>
+                <option value="c41">Color Negative (C-41)</option>
+                <option value="bw">Black & White</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="originalSpeed">Original Film Speed (ISO):</label>
+            <select id="originalSpeed" required>
+                <option value="3200">3200</option>
+                <option value="1600">1600</option>
+                <option value="800">800</option>
+                <option value="400">400</option>
+                <option value="200">200</option>
+                <option value="100">100</option>
+                <option value="50">50</option>
+                <option value="25">25</option>
+                <option value="12">12</option>
+                <option value="6">6</option>
+                <option value="3">3</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="expireMonth">Film Expiration Date:</label>
+            <div class="month-picker">
+                <select id="expireMonth" required>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+                <select id="expireYear" required>
+                    <!-- Years will be populated with JavaScript -->
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="calculateSpeed()">Calculate</button>
+        
+        <div id="result" class="result" style="display: none;"></div>
+        
+        <div class="credits">
+            © Rainnighttram 2025
+        </div>
+    </div>
+
+    <script>
+        // Populate year selector with years from 1950 to current year
+        const yearSelect = document.getElementById('expireYear');
+        const currentYear = new Date().getFullYear();
+        
+        for (let year = currentYear; year >= 1950; year--) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            yearSelect.appendChild(option);
+        }
+
+        const ISO_STOPS = [3200, 1600, 800, 400, 200, 100, 50, 25, 12, 6, 3];
+
+        function findClosestISOStop(iso) {
+            return ISO_STOPS.reduce((prev, curr) => 
+                Math.abs(curr - iso) < Math.abs(prev - iso) ? curr : prev
+            );
+        }
+
+        function calculateSpeed() {
+            const originalSpeed = parseInt(document.getElementById('originalSpeed').value);
+            const expireMonth = parseInt(document.getElementById('expireMonth').value);
+            const expireYear = parseInt(document.getElementById('expireYear').value);
+            const filmType = document.getElementById('filmType').value;
+            
+            // Create date objects using month and year
+            const expireDate = new Date(expireYear, expireMonth - 1, 15); // Middle of the month
+            const currentDate = new Date();
+            
+            // Calculate years difference more precisely
+            const yearsDiff = (currentDate - expireDate) / (1000 * 60 * 60 * 24 * 365.25);
+            
+            // Calculate stops based on film type with linear progression
+            let stops = 0;
+            let baseStops = 0;
+            let highISOStops = 0;
+            
+            if (yearsDiff > 0) {  // Only apply stops if the film is actually expired
+                if (filmType === 'c41') {
+                    // Linear calculation: 0.1 stop per year for C-41
+                    baseStops = yearsDiff * 0.1;
+                } else if (filmType === 'bw') {
+                    // Linear calculation: 0.05 stop per year for B&W (degrades at half the rate)
+                    baseStops = yearsDiff * 0.05;
+                }
+
+                // Add extra stops for high sensitivity films (over 400 ISO)
+                if (originalSpeed > 400) {
+                    const stopsPer400 = Math.log2(originalSpeed / 400);
+                    highISOStops = stopsPer400 * 0.5; // 1/2 stop per 400 ISO increase
+                }
+                
+                stops = baseStops + highISOStops;
+            }
+            
+            // Calculate new ISO
+            const newISO = originalSpeed / Math.pow(2, stops);
+            const recommendedISO = findClosestISOStop(newISO);
+            
+            // Format the yearsDiff message
+            let yearsDiffMessage = '';
+            if (yearsDiff <= 0) {
+                yearsDiffMessage = 'Film is not expired yet';
+            } else {
+                yearsDiffMessage = `${yearsDiff.toFixed(1)} years`;
+            }
+
+            // Display results with more detailed compensation explanation
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <h3>Results:</h3>
+                <p>Original ISO: ${originalSpeed}</p>
+                <p>Film Type: ${filmType === 'c41' ? 'Color Negative (C-41)' : 'Black & White'}</p>
+                <p>Years expired: ${yearsDiffMessage}</p>
+                ${yearsDiff > 0 ? `
+                    <p>Base compensation: +${baseStops.toFixed(1)} stop(s)</p>
+                    ${originalSpeed > 400 ? `<p>High ISO compensation: +${highISOStops.toFixed(1)} stop(s)</p>` : ''}
+                    <p>Total compensation: +${stops.toFixed(1)} stop(s)</p>
+                ` : ''}
+                <p>Calculated ISO: ${Math.round(newISO)}</p>
+                <p><strong>Recommended ISO setting: ${recommendedISO}</strong></p>
+                <p><small>Note: This is a general guideline. Results may vary based on storage conditions.</small></p>
+            `;
+        }
+    </script>
+</body>
+</html>
